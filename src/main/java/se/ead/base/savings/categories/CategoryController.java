@@ -1,5 +1,6 @@
 package se.ead.base.savings.categories;
 
+import jakarta.annotation.security.RolesAllowed;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -20,11 +21,13 @@ public class CategoryController {
     CategoryMapper categoryMapper;
 
     @PostMapping
+    @RolesAllowed("ROLE_ADMIN")
     public Category createCategory(@RequestBody CategoryEntity entity) {
         return categoryMapper.from(categoryRepository.save(entity));
     }
 
     @GetMapping
+    @RolesAllowed({"ROLE_ADMIN", "ROLE_USER"})
     public Page<Category> getCategories() {
         return categoryRepository.findAll(Pageable.ofSize(10))
                 .map(categoryMapper::from);

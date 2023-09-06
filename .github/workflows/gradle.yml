@@ -22,7 +22,6 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
         with:
-          token: ${{ secrets.PAT }}
           submodules: recursive
 
       - name: Set up JDK 17
@@ -43,7 +42,6 @@ jobs:
           coverage_results_path: jacoco-report/test.xml
           coverage_report_name: Coverage
           coverage_report_title: JaCoCo
-          github_token: ${{ secrets.PAT }}
           skip_check_run: false
           minimum_coverage: 80
           fail_below_threshold: false

@@ -1,4 +1,4 @@
-ALTER TABLE savings.category
+ALTER TABLE category
     ADD COLUMN created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     ADD COLUMN modified_at TIMESTAMPTZ,
     ADD COLUMN created_by VARCHAR,

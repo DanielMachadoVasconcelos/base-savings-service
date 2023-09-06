@@ -8,6 +8,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 import jakarta.validation.constraints.NotEmpty;
 import java.util.Date;
 import java.util.UUID;
@@ -28,7 +29,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity(name = "category")
-@Table(name = "category", schema = "savings")
+@Table(name = "category")
 @EntityListeners(AuditingEntityListener.class)
 public class CategoryEntity {
 
@@ -38,11 +39,11 @@ public class CategoryEntity {
     UUID categoryId;
 
     @NotEmpty
-    @Column(name = "category_name")
+    @Column(name = "category_name", unique = true, nullable = false)
     String categoryName;
 
     @CreatedDate
-    @Column(name = "created_at", nullable = false, updatable = false)
+    @Column(name = "created_at", updatable = false)
     private Date createdAt;
 
     @LastModifiedDate

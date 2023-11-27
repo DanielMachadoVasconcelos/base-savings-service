@@ -75,6 +75,5 @@ public class MemberController {
         return memberService.findRevisions(memberId, pageable);
     }
 
-    private record UpdateMemberNameRequest(@NotEmpty String memberName) {
-    }
+    public record UpdateMemberNameRequest(@NotEmpty String memberName) {}
 }

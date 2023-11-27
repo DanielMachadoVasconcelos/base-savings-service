@@ -7,6 +7,7 @@ import jakarta.persistence.EntityListeners;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.PrePersist;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 import java.util.Date;
@@ -35,7 +36,6 @@ public class MemberEntity {
 
     @Id
     @Column(name = "member_id")
-    @GeneratedValue(strategy = GenerationType.UUID)
     private UUID memberId;
 
     @Column(name = "member_name")
@@ -57,4 +57,10 @@ public class MemberEntity {
     @Column(name = "modified_by")
     private String modifiedBy;
 
+    @PrePersist
+    public void ensureId(){
+        if (memberId == null) {
+            memberId = UUID.randomUUID();
+        }
+    }
 }

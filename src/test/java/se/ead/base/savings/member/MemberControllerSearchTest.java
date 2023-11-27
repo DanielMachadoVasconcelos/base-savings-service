@@ -14,6 +14,8 @@ import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.security.authentication.TestingAuthenticationToken;
@@ -57,12 +59,34 @@ class MemberControllerSearchTest extends SpringBootIntegrationTest {
 
     @Test
     @WithMockUser
-    @DisplayName("Should be able to find a member by member name")
-    void shouldBeAbleToFindAMemberByMemberName() throws Exception {
+    @DisplayName("Should be able to find a member when searching by member name")
+    void shouldBeAbleToFindAMemberWhenSearchingByMemberName() throws Exception {
 
         // when: searching for a member by member name
         var response = mockMvc.perform(get("/v1/members/search")
-                        .param("member_name", expectedMemberName)
+                        .queryParam("member_name", expectedMemberName)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .characterEncoding("utf-8")
+                );
+
+        // then: the member is found
+        response.andDo(print())
+                .andExpect(status().isOk())
+                .andExpectAll(
+                    jsonPath("$.content").isArray(),
+                    jsonPath("$.content[0].member_name").value(expectedMemberName)
+                );
+    }
+
+    @WithMockUser
+    @CsvSource({"Potter", "Harry", "Harry Potter", "potter", "harry", "harry potter"})
+    @ParameterizedTest(name = "#{index} - Should find a member with name [{0}]")
+    @DisplayName("Should be able to find a member when searching by a partial member name")
+    void shouldBeAbleToFindAMemberWhenSearchingByPartialMemberName(String memberName) throws Exception {
+
+        // when: searching for a member by member name
+        var response = mockMvc.perform(get("/v1/members/search")
+                        .queryParam("member_name", memberName)
                         .contentType(MediaType.APPLICATION_JSON)
                         .characterEncoding("utf-8")
                 );
@@ -82,7 +106,7 @@ class MemberControllerSearchTest extends SpringBootIntegrationTest {
     void shouldBeAbleToFindAMemberWhenSearchingByMemberId() throws Exception {
 
         // when: searching for a member by member id
-        var response = mockMvc.perform(get("/v1/members/{memberId}", expectedMemberId)
+        var response = mockMvc.perform(get("/v1/members/%s".formatted(expectedMemberId))
                         .contentType(MediaType.APPLICATION_JSON)
                         .characterEncoding("utf-8")
                 );

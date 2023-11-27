@@ -31,7 +31,7 @@ public class MemberService {
     }
 
     public Page<Member> findByName(Pageable pageable, String memberName) {
-        return memberRepository.findByMemberName(pageable, memberName)
+        return memberRepository.findByMemberNameLike(pageable, "%" + memberName + "%")
                 .map(memberMapper::from);
     }
 

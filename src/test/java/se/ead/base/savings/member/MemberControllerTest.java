@@ -71,7 +71,7 @@ class MemberControllerTest extends SpringBootIntegrationTest {
                 .andExpect(status().isCreated());
 
         // when: the admin wishes to update the member name
-        var response = mockMvc.perform(patch("/v1/members/{memberId}", member.memberId())
+        var response = mockMvc.perform(patch("/v1/members/%s".formatted(member.memberId()))
                     .contentType(MediaType.APPLICATION_JSON)
                     .characterEncoding("utf-8")
                     .content(objectMapper.writeValueAsString(new UpdateMemberNameRequest("Harry Potter")))

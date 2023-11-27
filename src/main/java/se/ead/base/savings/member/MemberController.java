@@ -41,7 +41,7 @@ public class MemberController {
     @PatchMapping("/{memberId}")
     @ResponseStatus(HttpStatus.OK)
     @RolesAllowed({"ROLE_ADMIN", "ROLE_USER"})
-    public Member updateMember(@PathVariable @NotNull UUID memberId,
+    public Member updateMember(@PathVariable(name = "memberId") @NotNull UUID memberId,
                                @RequestBody UpdateMemberNameRequest request) {
         return memberService.update(memberId, request.memberName());
     }
@@ -49,7 +49,7 @@ public class MemberController {
     @GetMapping("/{memberId}")
     @ResponseStatus(HttpStatus.OK)
     @RolesAllowed({"ROLE_ADMIN", "ROLE_USER"})
-    public Member findMemberById(@PathVariable @NotNull UUID memberId) {
+    public Member findMemberById(@PathVariable(name = "memberId") @NotNull UUID memberId) {
         return memberService.findMemberById(memberId);
     }
 

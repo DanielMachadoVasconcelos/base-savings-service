@@ -12,6 +12,8 @@ ALTER TABLE member
     ADD COLUMN created_by  VARCHAR,
     ADD COLUMN modified_by VARCHAR;
 
+ALTER TABLE member ALTER COLUMN member_name TYPE VARCHAR COLLATE "pg_catalog"."C";
+
 create sequence member_revision_seq INCREMENT BY 1 START WITH 1;
 
 create table member_revision

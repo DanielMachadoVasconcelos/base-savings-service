@@ -81,7 +81,7 @@ class MemberControllerTest extends SpringBootIntegrationTest {
     @DisplayName("Should not be able to save a new member when providing a non-unique member name as user")
     void shouldNotBeAbleToSaveANewMemberWhenMemberNameAlreadyExists() throws Exception {
 
-        // setup: creating a pre existing member
+        // setup: creating a pre-existing member
         mockMvc.perform(post("/v1/members")
                         .contentType(MediaType.APPLICATION_JSON)
                         .characterEncoding("utf-8")

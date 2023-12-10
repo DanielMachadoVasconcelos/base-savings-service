@@ -12,7 +12,10 @@ import org.springframework.data.repository.query.Param;
 public interface MemberRepository extends ListPagingAndSortingRepository<MemberEntity, UUID>,
         ListCrudRepository<MemberEntity, UUID>, RevisionRepository<MemberEntity, UUID, Integer> {
 
-    @Query("SELECT m FROM member m WHERE m.memberName ILIKE :name")
-    Page<MemberEntity> findByMemberNameLike(Pageable pageable, @Param("name") String memberName);
+    @Query(nativeQuery = true,
+        value = "SELECT * FROM public.member WHERE SIMILARITY(member.member_name, ?) > 0.4",
+        countQuery = "SELECT COUNT(*) FROM public.member WHERE SIMILARITY(member.member_name, ?) > 0.4"
+    )
+    Page<MemberEntity> findByMemberNameLike(Pageable pageable, String memberName);
 
 }

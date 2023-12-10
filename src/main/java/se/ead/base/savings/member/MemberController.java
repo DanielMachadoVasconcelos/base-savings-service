@@ -57,7 +57,7 @@ public class MemberController {
     @RolesAllowed({"ROLE_ADMIN", "ROLE_USER"})
     public Page<Member> findByMemberName(
             @RequestParam(value = "member_name") @NotEmpty String memberName,
-            @PageableDefault(size = 20, sort = "memberName", direction = ASC) Pageable pageable
+            @PageableDefault(size = 20, sort = "member_name", direction = ASC) Pageable pageable
     ) {
         return memberService.findByName(pageable, memberName);
     }

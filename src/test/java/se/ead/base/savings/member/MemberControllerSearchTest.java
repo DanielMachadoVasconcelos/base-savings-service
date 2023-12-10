@@ -79,10 +79,32 @@ class MemberControllerSearchTest extends SpringBootIntegrationTest {
     }
 
     @WithMockUser
-    @CsvSource({"Potter", "Harry", "Harry Potter", "potter", "harry", "harry potter"})
+    @CsvSource({"Potter", "Harry", "Harry Potter", "potter", "harry", "harry potter", "HARRY POTTER"})
     @ParameterizedTest(name = "#{index} - Should find a member with name [{0}]")
     @DisplayName("Should be able to find a member when searching by a partial member name")
     void shouldBeAbleToFindAMemberWhenSearchingByPartialMemberName(String memberName) throws Exception {
+
+        // when: searching for a member by member name
+        var response = mockMvc.perform(get("/v1/members/search")
+                        .queryParam("member_name", memberName)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .characterEncoding("utf-8")
+                );
+
+        // then: the member is found
+        response.andDo(print())
+                .andExpect(status().isOk())
+                .andExpectAll(
+                    jsonPath("$.content").isArray(),
+                    jsonPath("$.content[0].member_name").value(expectedMemberName)
+                );
+    }
+
+    @WithMockUser
+    @CsvSource({"Hair potter", "hary potter", "harry poter", "HARRY POTTER"})
+    @ParameterizedTest(name = "#{index} - Should find a member with name [{0}]")
+    @DisplayName("Should be able to find a member when searching by a similar member name")
+    void shouldBeAbleToFindAMemberWhenSearchingBySimilarMemberName(String memberName) throws Exception {
 
         // when: searching for a member by member name
         var response = mockMvc.perform(get("/v1/members/search")

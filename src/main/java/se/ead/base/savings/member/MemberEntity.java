@@ -5,6 +5,7 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
 import jakarta.persistence.Id;
+import jakarta.persistence.Lob;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
 import java.util.Date;
@@ -19,6 +20,7 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedBy;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+import se.ead.base.savings.encryption.Encrypted;
 
 @With
 @Data
@@ -36,6 +38,11 @@ public class MemberEntity {
 
     @Column(name = "member_name")
     private String memberName;
+
+    @Lob
+    @Encrypted
+    @Column(name = "member_email", columnDefinition = "bytea")
+    private byte[] email;
 
     @CreatedDate
     @Column(name = "created_at", updatable = false)

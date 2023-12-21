@@ -30,6 +30,7 @@ class MemberControllerSearchTest extends SpringBootIntegrationTest {
 
     private final UUID expectedMemberId = UUID.randomUUID();
     private final String expectedMemberName = "Harry Potter";
+    private final String expectedMemberEmail = "harry.potter@gmail.com";
 
     @Autowired
     private MockMvc mockMvc;
@@ -41,7 +42,7 @@ class MemberControllerSearchTest extends SpringBootIntegrationTest {
     @DisplayName("Must have an already existing member persisted in the database")
     void setUp() throws Exception {
         // given: a new member
-        Member member = new Member(expectedMemberId, expectedMemberName);
+        Member member = new Member(expectedMemberId, expectedMemberName, expectedMemberEmail);
 
         // when: creating a new member
         Authentication authentication = new TestingAuthenticationToken("admin", "password", "ROLE_ADMIN");

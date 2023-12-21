@@ -35,7 +35,7 @@ class MemberControllerTest extends SpringBootIntegrationTest {
     void shouldBeAbleToSaveANewMemberWhenProvidingAUniqueMemberNameAsAdmin() throws Exception {
 
         // given: a new member
-        Member member = new Member(UUID.randomUUID(), "Harry Potter");
+        Member member = new Member(UUID.randomUUID(), "Harry Potter", "harry.potter@gmail.com");
 
         // when: creating a new member
         var response = mockMvc.perform(post("/v1/members")
@@ -60,7 +60,7 @@ class MemberControllerTest extends SpringBootIntegrationTest {
     void shouldBeAbleToUpdateAMemberNameWhenProvidingAnMemberIdAsAdmin() throws Exception {
 
         // given: a new member with an incorrect member name
-        Member member = new Member(UUID.randomUUID(), "Harry Poter");
+        Member member = new Member(UUID.randomUUID(), "Harry Poter", "harry.potter@gmail.com");
 
         // and: the new member was created with incorrect name
         mockMvc.perform(post("/v1/members")
@@ -92,7 +92,7 @@ class MemberControllerTest extends SpringBootIntegrationTest {
     void shouldBeAbleToSaveANewMemberWhenProvidingAUniqueMemberNameAsUser() throws Exception {
 
         // given: a new member
-        Member member = new Member(UUID.randomUUID(), "Albus Dumbledore");
+        Member member = new Member(UUID.randomUUID(), "Albus Dumbledore", "albus.dumbledore@gmail.com");
 
         // when: creating a new member
         var response = mockMvc.perform(post("/v1/members")
@@ -120,13 +120,13 @@ class MemberControllerTest extends SpringBootIntegrationTest {
         mockMvc.perform(post("/v1/members")
                         .contentType(MediaType.APPLICATION_JSON)
                         .characterEncoding("utf-8")
-                        .content(objectMapper.writeValueAsString(new Member(UUID.randomUUID(), "Albus Dumbledore"))))
+                        .content(objectMapper.writeValueAsString(new Member(UUID.randomUUID(), "Albus Dumbledore", "albus.dumbledore@gmail.com"))))
                 .andDo(print())
                 .andExpect(status().isCreated())
                 .andReturn();
 
         // given: a new member with the same unique member name
-        Member member = new Member(UUID.randomUUID(), "Albus Dumbledore");
+        Member member = new Member(UUID.randomUUID(), "Albus Dumbledore", "albus.dumbledore@gmail.com");
 
         // when: trying to create a new member with same member name
         var response = mockMvc.perform(post("/v1/members")

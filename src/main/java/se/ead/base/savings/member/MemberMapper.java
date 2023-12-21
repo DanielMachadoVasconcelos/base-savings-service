@@ -1,11 +1,17 @@
 package se.ead.base.savings.member;
 
+import java.util.UUID;
+import org.mapstruct.AfterMapping;
+import org.mapstruct.BeforeMapping;
 import org.mapstruct.InjectionStrategy;
 import org.mapstruct.Mapper;
+import org.mapstruct.MappingTarget;
 import org.mapstruct.ReportingPolicy;
+import se.ead.base.savings.encryption.StringToBytesMapper;
 
 @Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE,
         componentModel = "spring",
+        uses = {StringToBytesMapper.class},
         injectionStrategy = InjectionStrategy.CONSTRUCTOR
 )
 public interface MemberMapper {

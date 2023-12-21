@@ -2,6 +2,7 @@ package se.ead.base.savings.member;
 
 import static org.springframework.data.domain.Sort.Direction.ASC;
 
+import io.micrometer.observation.annotation.Observed;
 import jakarta.annotation.security.RolesAllowed;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
@@ -27,6 +28,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @AllArgsConstructor
 @RequestMapping("/v1/members")
+@Observed(name = "member_controller")
 public class MemberController {
 
     MemberService memberService;

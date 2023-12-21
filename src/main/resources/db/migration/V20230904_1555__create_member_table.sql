@@ -1,9 +1,10 @@
 CREATE TABLE IF NOT EXISTS member
 (
-    member_id   UUID         NOT NULL DEFAULT gen_random_uuid(),
-    member_name VARCHAR(255) NOT NULL,
+    member_id       UUID         NOT NULL DEFAULT gen_random_uuid(),
+    member_name     VARCHAR(255) NOT NULL,
+    member_email    BYTEA,
     CONSTRAINT pk_member PRIMARY KEY (member_id),
-    CONSTRAINT uk_member_name UNIQUE (member_name)
+    CONSTRAINT uk_member_email UNIQUE (member_email)
 );
 
 ALTER TABLE member
@@ -30,6 +31,7 @@ CREATE TABLE member_aud
     rev         BIGINT NOT NULL REFERENCES member_revision (rev),
     revtype     smallint,
     member_name varchar(255),
+    member_email BYTEA,
     created_at  timestamp(6),
     created_by  varchar(255),
     modified_at timestamp(6),

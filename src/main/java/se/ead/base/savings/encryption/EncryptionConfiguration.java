@@ -2,9 +2,10 @@ package se.ead.base.savings.encryption;
 
 import static com.amazonaws.client.builder.AwsClientBuilder.*;
 
+import com.amazonaws.auth.AWSCredentialsProvider;
 import com.amazonaws.auth.AWSStaticCredentialsProvider;
 import com.amazonaws.auth.BasicAWSCredentials;
-import com.amazonaws.client.builder.AwsClientBuilder;
+import com.amazonaws.auth.DefaultAWSCredentialsProviderChain;
 import com.amazonaws.encryptionsdk.AwsCrypto;
 import com.amazonaws.encryptionsdk.CommitmentPolicy;
 import com.amazonaws.encryptionsdk.CryptoMaterialsManager;
@@ -13,9 +14,11 @@ import com.amazonaws.encryptionsdk.caching.CachingCryptoMaterialsManager;
 import com.amazonaws.encryptionsdk.caching.CryptoMaterialsCache;
 import com.amazonaws.encryptionsdk.caching.LocalCryptoMaterialsCache;
 import com.amazonaws.encryptionsdk.kms.KmsMasterKeyProvider;
-import com.amazonaws.regions.Region;
 import com.amazonaws.regions.Regions;
+import com.amazonaws.services.kms.AWSKMS;
+import com.amazonaws.services.kms.AWSKMSAsync;
 import com.amazonaws.services.kms.AWSKMSAsyncClientBuilder;
+import com.amazonaws.services.kms.AWSKMSClientBuilder;
 import jakarta.annotation.PostConstruct;
 import java.util.Collections;
 import java.util.List;
@@ -46,8 +49,8 @@ class EncryptionConfiguration {
 		// This is mostly needed since the encryptor library won't allow us to override the default
 		// credentials lookup-chain in the AWS SDK. This is the only way to require no manual setup
 		// like setting AWS environment-variables or creating an AWS-credentials file.
-		System.setProperty("aws.accessKeyId", "anything");
-		System.setProperty("aws.secretKey", "anything");
+		System.setProperty("aws.accessKeyId", "fake");
+		System.setProperty("aws.secretKey", "fake");
 	}
 
 	@Bean
@@ -62,16 +65,43 @@ class EncryptionConfiguration {
 
 	@Bean
 	@Profile({"local", "integration-test"})
-	public MasterKeyProvider kmsProvider(EncryptionProperties properties) {
-		String defaultRegion = Regions.EU_WEST_1.getName();
+	public Regions defaultRegion() {
+		return Regions.EU_WEST_1;
+	}
+
+	@Bean
+	@Profile({"local", "integration-test"})
+	public EndpointConfiguration kmsEndpoint(Regions defaultRegion) {
+		return new EndpointConfiguration("http://localhost:4566", defaultRegion.getName());
+	}
+
+	@Bean
+	@Profile({"local", "integration-test"})
+	public AWSCredentialsProvider awsCredentialsProvider(){
+		return new AWSStaticCredentialsProvider(new BasicAWSCredentials("fake", "fake"));
+	}
+
+	@Bean
+	@Profile("!local & !integration-test")
+	public AWSCredentialsProvider awsCredentialsProviderForProduction() {
+		return DefaultAWSCredentialsProviderChain.getInstance();
+	}
+
+	@Bean
+	@Profile({"local", "integration-test"})
+	public AWSKMS kmsClient(EndpointConfiguration kmsEndpoint, AWSCredentialsProvider awsCredentialsProvider) {
+		return AWSKMSClientBuilder.standard()
+				.withCredentials(awsCredentialsProvider)
+				.withEndpointConfiguration(kmsEndpoint)
+				.build();
+	}
+
+	@Bean
+	@Profile({"local", "integration-test"})
+	public MasterKeyProvider kmsProvider(AWSKMS awsKms, Regions regions, EncryptionProperties properties) {
 		return KmsMasterKeyProvider.builder()
-				.withDefaultRegion(defaultRegion)
-				.withCustomClientFactory(regionName ->
-						AWSKMSAsyncClientBuilder.standard()
-							.withCredentials(new AWSStaticCredentialsProvider(new BasicAWSCredentials("fake", "fake")))
-							.withEndpointConfiguration(new AwsClientBuilder.EndpointConfiguration("http://localhost:5566", defaultRegion))
-							.build()
-				)
+				.withDefaultRegion(regions.name())
+				.withCustomClientFactory(regionName -> awsKms)
 				.buildStrict(properties.getAwsKmsCmk());
 	}
 

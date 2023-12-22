@@ -1,11 +1,8 @@
 package se.ead.base.savings.encryption;
 
-import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.RequiredArgsConstructor;
-import lombok.experimental.FieldDefaults;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 
@@ -15,9 +12,9 @@ import org.springframework.context.annotation.Configuration;
 @NoArgsConstructor
 public class EncryptionProperties {
 
-	@Value("${application.encryption.aws_kms_cmk:#{arn:aws:kms:eu-west-1:000000000000:alias/test-only}}")
+	@Value("${application.encryption.aws_kms_cmk:#{'arn:aws:kms:eu-west-1:000000000000:alias/test-only'}}")
 	String awsKmsCmk;
 
-	@Value(value = "${application.encryption.aws-kms-local-port:#{5566}}")
+	@Value(value = "${application.encryption.aws-kms-local-port:#{4566}}")
 	Integer localPort;
 }

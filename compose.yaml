@@ -16,7 +16,7 @@ services:
       - KMS_PROVIDER=local-kms
       - DEFAULT_REGION=eu-west-1
     ports:
-      - "5566:4566"
+      - "4566:4566"
     volumes:
       - ./kms-seed.yaml:/init/seed.yaml
     healthcheck:

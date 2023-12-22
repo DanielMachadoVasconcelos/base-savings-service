@@ -20,6 +20,7 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedBy;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+import se.ead.base.savings.confidentiality.SensitiveData;
 import se.ead.base.savings.encryption.Encrypted;
 
 @With
@@ -41,6 +42,7 @@ public class MemberEntity {
 
     @Lob
     @Encrypted
+    @SensitiveData
     @Column(name = "member_email", columnDefinition = "bytea")
     private byte[] email;
 

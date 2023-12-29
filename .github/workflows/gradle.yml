@@ -33,22 +33,4 @@ jobs:
       - name: Build with Gradle
         uses: gradle/gradle-build-action@v2
         with:
-          arguments: build jacocoTestReport
-
-      - name: JaCoCo Code Coverage Report
-        id: jacoco_reporter
-        uses: PavanMudigonda/jacoco-reporter@v4.8
-        with:
-          coverage_results_path: build/reports/jacoco/test/jacocoTestReport.xml
-          coverage_report_name: Coverage
-          coverage_report_title: JaCoCo
-          skip_check_run: false
-          minimum_coverage: 80
-          fail_below_threshold: false
-          publish_only_summary: false
-
-      - name: Upload JaCoCo Coverage Report
-        uses: actions/upload-artifact@v3
-        with:
-          name: jacoco-coverage-report
-          path: build/reports/jacoco/test
+          arguments: build

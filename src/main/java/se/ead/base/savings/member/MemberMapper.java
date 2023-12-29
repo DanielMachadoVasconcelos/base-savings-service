@@ -1,5 +1,7 @@
 package se.ead.base.savings.member;
 
+import java.time.Clock;
+import java.time.ZonedDateTime;
 import java.util.UUID;
 import org.mapstruct.AfterMapping;
 import org.mapstruct.BeforeMapping;
@@ -19,4 +21,11 @@ public interface MemberMapper {
     MemberEntity from(Member member);
 
     Member from(MemberEntity entity);
+
+    @AfterMapping
+    default void updateDefaultValues(@MappingTarget MemberEntity entity) {
+        if(entity.getVersion() != null || entity.getVersion() < 1)  {
+            entity.setVersion(1L);
+        }
+    }
 }

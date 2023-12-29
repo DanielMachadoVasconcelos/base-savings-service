@@ -9,7 +9,7 @@ services:
       - '5432:5432'
 
   localstack:
-    image: localstack/localstack:2.1.0
+    image: localstack/localstack:latest
     container_name: localstack
     environment:
       - SERVICES=kms,sns,sqs

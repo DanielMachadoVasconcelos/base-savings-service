@@ -29,8 +29,10 @@ import se.ead.base.savings.SpringBootIntegrationTest;
 class MemberControllerSearchTest extends SpringBootIntegrationTest {
 
     private final UUID expectedMemberId = UUID.randomUUID();
+    private final Long expectedVersion = 1L;
     private final String expectedMemberName = "Harry Potter";
     private final String expectedMemberEmail = "harry.potter@gmail.com";
+    private final String expectedBiography = "The boy who survived";
 
     @Autowired
     private MockMvc mockMvc;
@@ -42,7 +44,12 @@ class MemberControllerSearchTest extends SpringBootIntegrationTest {
     @DisplayName("Must have an already existing member persisted in the database")
     void setUp() throws Exception {
         // given: a new member
-        Member member = new Member(expectedMemberId, expectedMemberName, expectedMemberEmail);
+        Member member = new Member(expectedMemberId,
+            expectedVersion,
+            expectedMemberName,
+            expectedMemberEmail,
+            expectedBiography
+        );
 
         // when: creating a new member
         Authentication authentication = new TestingAuthenticationToken("admin", "password", "ROLE_ADMIN");
@@ -75,7 +82,10 @@ class MemberControllerSearchTest extends SpringBootIntegrationTest {
                 .andExpect(status().isOk())
                 .andExpectAll(
                     jsonPath("$.content").isArray(),
-                    jsonPath("$.content[0].member_name").value(expectedMemberName)
+                    jsonPath("$.content[0].member_version").value(1 + expectedVersion),
+                    jsonPath("$.content[0].member_name").value(expectedMemberName),
+                    jsonPath("$.content[0].member_email").isEmpty(),    // sensitive data
+                    jsonPath("$.content[0].member_biography").isEmpty() // sensitive data
                 );
     }
 
@@ -139,7 +149,33 @@ class MemberControllerSearchTest extends SpringBootIntegrationTest {
                 .andExpect(status().isOk())
                 .andExpectAll(
                     jsonPath("$.member_id").value(is(expectedMemberId.toString())),
-                    jsonPath("$.member_name").value(is(expectedMemberName))
+                    jsonPath("$.member_version").value(is(2)),
+                    jsonPath("$.member_name").value(is(expectedMemberName)),
+                    jsonPath("$.member_email").isEmpty(),    // sensitive data
+                    jsonPath("$.member_biography").isEmpty() // sensitive data
+                );
+    }
+
+    @Test
+    @WithMockUser(value = "ADMIN", authorities = {"READ_SENSITIVE_DATA", "SENSITIVE_DATA"})
+    @DisplayName("Should be able to read a member sensitive data when principal has the necessary permissions")
+    void shouldBeAbleToReadSensitiveDataWhenPrincipalHaveTheNecessaryPermission() throws Exception {
+
+        // when: searching for a member by member id
+        var response = mockMvc.perform(get("/v1/members/%s".formatted(expectedMemberId))
+                .contentType(MediaType.APPLICATION_JSON)
+                .characterEncoding("utf-8")
+        );
+
+        // then: the member is found
+        response.andDo(print())
+                .andExpect(status().isOk())
+                .andExpectAll(
+                        jsonPath("$.member_id").value(is(expectedMemberId.toString())),
+                        jsonPath("$.member_version").value(is(2)),
+                        jsonPath("$.member_name").value(is(expectedMemberName)),
+                        jsonPath("$.member_email").value(is(expectedMemberEmail)),  // sensitive data
+                        jsonPath("$.member_biography").value(is(expectedBiography)) // sensitive data
                 );
     }
 }

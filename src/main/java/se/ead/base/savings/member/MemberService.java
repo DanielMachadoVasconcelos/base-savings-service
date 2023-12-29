@@ -1,5 +1,7 @@
 package se.ead.base.savings.member;
 
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -22,9 +24,9 @@ public class MemberService {
     }
 
     @Transactional(isolation = Isolation.READ_COMMITTED)
-    public Member update(UUID memberId, String newMemberName) {
+    public Member update(@NotNull UUID memberId, @NotEmpty Long version, @NotEmpty String newMemberName) {
         return memberRepository.findById(memberId)
-                .map(entity -> entity.withMemberName(newMemberName))
+                .map(entity -> entity.withName(newMemberName).withVersion(version))
                 .map(memberRepository::save)
                 .map(memberMapper::from)
                 .orElseThrow(() -> new IllegalArgumentException("Member not found"));

@@ -1,6 +1,5 @@
 package se.ead.base.savings.member;
 
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
@@ -8,6 +7,8 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Lob;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
+import jakarta.persistence.Version;
 import java.util.Date;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
@@ -29,22 +30,30 @@ import se.ead.base.savings.encryption.Encrypted;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity(name = "member")
-@Table(name = "member")
+@Table(name = "member", uniqueConstraints = { @UniqueConstraint(columnNames = {"email"}) })
 @EntityListeners(AuditingEntityListener.class)
 public class MemberEntity {
 
     @Id
-    @Column(name = "member_id")
-    private UUID memberId;
+    @Column(name = "id")
+    private UUID id;
 
-    @Column(name = "member_name")
-    private String memberName;
+    @Column(name = "name")
+    private String name;
+
+    @Version
+    @Column(name = "version")
+    private Long version;
+
+    @SensitiveData
+    @Column(name = "email")
+    private String email;
 
     @Lob
     @Encrypted
     @SensitiveData
-    @Column(name = "member_email", columnDefinition = "bytea")
-    private byte[] email;
+    @Column(name = "biography")
+    private byte[] biography;
 
     @CreatedDate
     @Column(name = "created_at", updatable = false)
@@ -59,13 +68,13 @@ public class MemberEntity {
     private String createdBy;
 
     @LastModifiedBy
-    @Column(name = "modified_by")
+    @Column(name = "  modified_by")
     private String modifiedBy;
 
     @PrePersist
     public void ensureId(){
-        if (memberId == null) {
-            memberId = UUID.randomUUID();
+        if (id == null) {
+            id = UUID.randomUUID();
         }
     }
 }

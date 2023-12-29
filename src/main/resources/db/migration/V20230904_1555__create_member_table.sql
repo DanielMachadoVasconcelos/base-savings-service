@@ -1,10 +1,12 @@
 CREATE TABLE IF NOT EXISTS member
 (
-    member_id       UUID         NOT NULL DEFAULT gen_random_uuid(),
-    member_name     VARCHAR(255) NOT NULL,
-    member_email    BYTEA,
-    CONSTRAINT pk_member PRIMARY KEY (member_id),
-    CONSTRAINT uk_member_email UNIQUE (member_email)
+    id        UUID         NOT NULL DEFAULT gen_random_uuid(),
+    version   BIGINT       NOT NULL DEFAULT 1,
+    name      VARCHAR(255) NOT NULL,
+    email     VARCHAR(255),
+    biography TEXT,
+    CONSTRAINT pk_member PRIMARY KEY (id),
+    CONSTRAINT uk_member_email UNIQUE (email)
 );
 
 ALTER TABLE member
@@ -13,7 +15,8 @@ ALTER TABLE member
     ADD COLUMN created_by  VARCHAR,
     ADD COLUMN modified_by VARCHAR;
 
-ALTER TABLE member ALTER COLUMN member_name TYPE VARCHAR COLLATE "pg_catalog"."C";
+ALTER TABLE member
+    ALTER COLUMN name TYPE VARCHAR COLLATE "pg_catalog"."C";
 
 create sequence member_revision_seq INCREMENT BY 1 START WITH 1;
 
@@ -27,14 +30,16 @@ ALTER sequence member_revision_seq OWNED BY member_revision.rev;
 
 CREATE TABLE member_aud
 (
-    member_id   uuid   NOT NULL,
+    id   uuid   NOT NULL,
     rev         BIGINT NOT NULL REFERENCES member_revision (rev),
     revtype     smallint,
-    member_name varchar(255),
-    member_email BYTEA,
+    version     bigint,
+    name        varchar(255),
+    email       varchar(255),
+    biography   text,
     created_at  timestamp(6),
     created_by  varchar(255),
     modified_at timestamp(6),
     modified_by varchar(255),
-    PRIMARY KEY (rev, member_id)
+    PRIMARY KEY (rev, id)
 );

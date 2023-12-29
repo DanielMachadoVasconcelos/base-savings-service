@@ -35,9 +35,9 @@ dependencies {
     implementation 'com.querydsl:querydsl-jpa'
     implementation 'com.querydsl:querydsl-apt'
 
-    implementation 'com.amazonaws:aws-encryption-sdk-java:2.3.0'
-    implementation 'com.amazonaws:aws-java-sdk-core:1.12.622'
-    implementation 'com.amazonaws:aws-java-sdk-kms:1.12.622'
+    implementation 'com.amazonaws:aws-encryption-sdk-java:3.0.0'
+    implementation 'com.amazonaws:aws-java-sdk-core:1.12.627'
+    implementation 'com.amazonaws:aws-java-sdk-kms:1.12.627'
 
     implementation 'org.flywaydb:flyway-core'
 

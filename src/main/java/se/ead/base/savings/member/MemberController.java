@@ -2,6 +2,7 @@ package se.ead.base.savings.member;
 
 import static org.springframework.data.domain.Sort.Direction.ASC;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import io.micrometer.observation.annotation.Observed;
 import jakarta.annotation.security.RolesAllowed;
 import jakarta.validation.constraints.NotEmpty;
@@ -45,7 +46,7 @@ public class MemberController {
     @RolesAllowed({"ROLE_ADMIN", "ROLE_USER"})
     public Member updateMember(@PathVariable(name = "memberId") @NotNull UUID memberId,
                                @RequestBody UpdateMemberNameRequest request) {
-        return memberService.update(memberId, request.memberName());
+        return memberService.update(memberId, request.version(), request.newMemberName());
     }
 
     @GetMapping("/{memberId}")
@@ -59,23 +60,26 @@ public class MemberController {
     @RolesAllowed({"ROLE_ADMIN", "ROLE_USER"})
     public Page<Member> findByMemberName(
             @RequestParam(value = "member_name") @NotEmpty String memberName,
-            @PageableDefault(size = 20, sort = "member_name", direction = ASC) Pageable pageable
+            @PageableDefault(size = 20, sort = "name", direction = ASC) Pageable pageable
     ) {
         return memberService.findByName(pageable, memberName);
     }
 
     @GetMapping
     @RolesAllowed({"ROLE_ADMIN", "ROLE_USER"})
-    public Page<Member> findAllMembers(@PageableDefault(size = 20, sort = "memberName", direction = ASC) Pageable pageable) {
+    public Page<Member> findAllMembers(@PageableDefault(size = 20, sort = "name", direction = ASC) Pageable pageable) {
         return memberService.findAll(pageable);
     }
 
     @GetMapping("/{memberId}/revisions")
     @RolesAllowed({"ROLE_ADMIN", "ROLE_USER"})
     public Page<Revision<Integer, MemberEntity>> getMemberAudits(@PathVariable UUID memberId,
-                                                                 @PageableDefault(size = 20, sort = "memberName", direction = ASC) Pageable pageable) {
+                                                                 @PageableDefault(size = 20, sort = "name", direction = ASC) Pageable pageable) {
         return memberService.findRevisions(memberId, pageable);
     }
 
-    public record UpdateMemberNameRequest(@NotEmpty String memberName) {}
+    public record UpdateMemberNameRequest(
+        @JsonProperty("member_version") @NotEmpty Long version,
+        @JsonProperty("member_name") @NotEmpty String newMemberName
+    ) {}
 }

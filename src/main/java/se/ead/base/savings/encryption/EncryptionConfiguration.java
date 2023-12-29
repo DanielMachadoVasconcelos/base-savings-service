@@ -16,9 +16,8 @@ import com.amazonaws.encryptionsdk.caching.LocalCryptoMaterialsCache;
 import com.amazonaws.encryptionsdk.kms.KmsMasterKeyProvider;
 import com.amazonaws.regions.Regions;
 import com.amazonaws.services.kms.AWSKMS;
-import com.amazonaws.services.kms.AWSKMSAsync;
-import com.amazonaws.services.kms.AWSKMSAsyncClientBuilder;
 import com.amazonaws.services.kms.AWSKMSClientBuilder;
+import com.amazonaws.services.kms.model.DescribeKeyRequest;
 import jakarta.annotation.PostConstruct;
 import java.util.Collections;
 import java.util.List;
@@ -60,7 +59,9 @@ class EncryptionConfiguration {
 
 	@Bean
 	public AwsCrypto crypto(CommitmentPolicy commitmentPolicy) {
-		return AwsCrypto.builder().withCommitmentPolicy(commitmentPolicy).build();
+		return AwsCrypto.builder()
+				.withCommitmentPolicy(commitmentPolicy)
+				.build();
 	}
 
 	@Bean
@@ -82,13 +83,19 @@ class EncryptionConfiguration {
 	}
 
 	@Bean
-	@Profile("!local & !integration-test")
+	@Profile({"local", "integration-test"})
+	public String kmsCmk(AWSKMS awsKmsClient, EncryptionProperties properties) {
+		// It needs to fetch the current key for the alias in the localstack
+		DescribeKeyRequest describeKeyRequest = new DescribeKeyRequest().withKeyId(properties.getAwsKmsCmk());
+		return awsKmsClient.describeKey(describeKeyRequest).getKeyMetadata().getArn();
+	}
+
+	@Bean
 	public AWSCredentialsProvider awsCredentialsProviderForProduction() {
 		return DefaultAWSCredentialsProviderChain.getInstance();
 	}
 
 	@Bean
-	@Profile({"local", "integration-test"})
 	public AWSKMS kmsClient(EndpointConfiguration kmsEndpoint, AWSCredentialsProvider awsCredentialsProvider) {
 		return AWSKMSClientBuilder.standard()
 				.withCredentials(awsCredentialsProvider)
@@ -97,20 +104,18 @@ class EncryptionConfiguration {
 	}
 
 	@Bean
-	@Profile({"local", "integration-test"})
-	public MasterKeyProvider kmsProvider(AWSKMS awsKms, Regions regions, EncryptionProperties properties) {
+	public MasterKeyProvider kmsProvider(AWSKMS awsKms, Regions regions, String kmsCmk) {
 		return KmsMasterKeyProvider.builder()
 				.withDefaultRegion(regions.name())
 				.withCustomClientFactory(regionName -> awsKms)
-				.buildStrict(properties.getAwsKmsCmk());
+				.buildStrict(kmsCmk);// The actual key for the alias 'arn:aws:kms:eu-west-1:000000000000:alias/test-only'
 	}
 
 	@Bean
-	@Profile({"local", "integration-test"})
 	public CryptoMaterialsManager cryptoMaterialsManager(MasterKeyProvider kmsProvider) {
 		// Configure the cache size and timeout as needed
-		int cacheMaxEntries = 100; // example max entries
-		long cacheMaxEntryAgeMillis = 60000; // example max age in milliseconds
+		int cacheMaxEntries = 100; 				// example max entries
+		long cacheMaxEntryAgeMillis = 60000; 	// example max age in milliseconds
 
 		CryptoMaterialsCache cache = new LocalCryptoMaterialsCache(cacheMaxEntries);
 

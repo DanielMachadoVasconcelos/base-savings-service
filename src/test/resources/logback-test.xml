@@ -1,0 +1,14 @@
+<configuration>
+    <debug>true</debug>
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>
+                %magenta(%d{HH:mm:ss.SSS}) %highlight(%-5level) [%cyan(%t)] %yellow(%C{1}) - %msg %mdc%n%throwable
+            </pattern>
+        </encoder>
+    </appender>
+    <logger name="feign" level="DEBUG"/>
+    <root level="INFO">
+        <appender-ref ref="STDOUT"/>
+    </root>
+</configuration>

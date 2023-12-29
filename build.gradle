@@ -1,16 +1,17 @@
 plugins {
     id 'java'
-    id 'org.springframework.boot' version '3.1.1'
-    id 'io.spring.dependency-management' version '1.1.0'
-    id 'org.hibernate.orm' version '6.2.5.Final'
-    id 'org.graalvm.buildtools.native' version '0.9.23'
+    id 'jacoco'
+    id 'org.springframework.boot' version '3.2.0'
+    id 'io.spring.dependency-management' version '1.1.4'
+    id 'org.hibernate.orm' version '6.4.0.Final'
+    id 'org.graalvm.buildtools.native' version '0.9.28'
 }
 
 group = 'se.ead.savings'
 version = '0.0.1-SNAPSHOT'
 
 java {
-    sourceCompatibility = '17'
+    sourceCompatibility = '21'
 }
 
 configurations {
@@ -30,16 +31,27 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
     implementation 'org.springframework.boot:spring-boot-starter-validation'
     implementation 'org.springframework.boot:spring-boot-starter-security'
+    implementation 'org.springframework.data:spring-data-envers'
+    implementation 'com.querydsl:querydsl-jpa'
+    implementation 'com.querydsl:querydsl-apt'
+
+    implementation 'com.amazonaws:aws-encryption-sdk-java:3.0.0'
+    implementation 'com.amazonaws:aws-java-sdk-core:1.12.627'
+    implementation 'com.amazonaws:aws-java-sdk-kms:1.12.627'
 
     implementation 'org.flywaydb:flyway-core'
-    implementation 'org.hibernate.orm:hibernate-envers:6.3.0.CR1'
+
+    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.2.0'
 
     compileOnly 'org.projectlombok:lombok'
+    implementation 'org.apache.commons:commons-collections4:4.4'
 
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
     developmentOnly 'org.springframework.boot:spring-boot-docker-compose'
 
     testImplementation 'org.springframework.boot:spring-boot-docker-compose'
+
+    implementation 'net.logstash.logback:logstash-logback-encoder:7.4'
 
     runtimeOnly 'org.postgresql:postgresql'
     annotationProcessor 'org.projectlombok:lombok'
@@ -51,9 +63,26 @@ dependencies {
     testImplementation 'org.springframework.security:spring-security-test'
 
 }
+jacocoTestReport {
+    dependsOn test
+    reports {
+        html.required = true
+        xml.required = true
+        csv.required = true
+    }
+    afterEvaluate {
+        classDirectories.setFrom(files(classDirectories.files.collect {
+            fileTree(dir: it, exclude: '**/generated/**')
+        }))
+    }
+}
 
-tasks.named('test') {
+test {
     useJUnitPlatform()
+    testLogging {
+        events "skipped", "failed"
+    }
+    finalizedBy jacocoTestReport
 }
 
 hibernate {

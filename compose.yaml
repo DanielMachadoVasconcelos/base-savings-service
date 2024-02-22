@@ -7,3 +7,37 @@ services:
       - 'POSTGRES_USER=user'
     ports:
       - '5432:5432'
+
+  localstack:
+    image: localstack/localstack:latest
+    container_name: localstack
+    environment:
+      - SERVICES=kms,sns,sqs
+      - KMS_PROVIDER=local-kms
+      - DEFAULT_REGION=eu-west-1
+    ports:
+      - "4566:4566"
+    volumes:
+      - ./kms-seed.yaml:/init/seed.yaml
+    healthcheck:
+      test: >
+        bash -c '
+          AWS_ACCESS_KEY_ID=fake AWS_SECRET_ACCESS_KEY=fake aws --region eu-west-1 --endpoint-url http://localhost:4566 kms create-key &&
+          AWS_ACCESS_KEY_ID=fake AWS_SECRET_ACCESS_KEY=fake aws --region eu-west-1 --endpoint-url http://localhost:4566 sns create-topic --name test-topic-for-healthcheck &&
+          AWS_ACCESS_KEY_ID=fake AWS_SECRET_ACCESS_KEY=fake aws --region eu-west-1 --endpoint-url http://localhost:4566 sqs create-queue --queue-name test-queue-for-healthcheck
+        '
+      timeout: 20s
+      retries: 10
+
+  prometheus:
+    image: 'prom/prometheus:v2.14.0'
+    ports:
+      - '9090:9090'
+    command: '--config.file=/etc/prometheus/config.yml'
+    volumes:
+      - './prometheus.yml:/etc/prometheus/config.yml'
+
+  grafana:
+    image: 'grafana/grafana:6.5.0'
+    ports:
+      - '3000:3000'

@@ -31,7 +31,7 @@ public class SecurityConfiguration {
                 )
                 .csrf(CsrfConfigurer::disable)
                 .httpBasic(Customizer.withDefaults())
-                .logout((logout) -> logout.permitAll())
+                .logout(logout -> logout.permitAll())
                 .sessionManagement(configurer -> configurer.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .build();
     }

@@ -1,0 +1,7 @@
+scrape_configs:
+  - job_name: 'jobName'
+    scrape_interval: 15s
+    scrape_timeout: 10s
+    metrics_path: '/actuator/prometheus'
+    static_configs:
+      - targets: ['192.168.0.31:8080'] # Replace for you machine ip address

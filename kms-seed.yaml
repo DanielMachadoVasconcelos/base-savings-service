@@ -1,0 +1,15 @@
+Keys:
+  - Metadata:
+      KeyId: "6e3a65bf-9f22-49ea-8b54-6a21d008d5e2"
+      Description: "Test key"
+      KeyUsage: "ENCRYPT_DECRYPT"
+      KeyState: "Enabled"
+      Origin: "AWS_KMS"
+      KeyManager: "CUSTOMER"
+      CustomerMasterKeySpec: "SYMMETRIC_DEFAULT"
+    BackingKeys:
+      - "34743777217A25432A46294A404E635266556A586E3272357538782F413F4428"
+
+Aliases:
+  - AliasName: "alias/test-only"
+    TargetKeyId: "6e3a65bf-9f22-49ea-8b54-6a21d008d5e2"
